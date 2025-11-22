@@ -1,177 +1,139 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Diagnostics.CodeAnalysis;
 
-namespace TarjetaSube
+public class Tarjeta
 {
-    public abstract class Tarjeta
+    protected decimal saldo;
+    protected decimal saldoPendiente;
+    private const decimal LIMITE_SALDO = 56000m;
+    private const decimal SALDO_NEGATIVO_PERMITIDO = 1200m;
+    private const decimal TARIFA_BASICA = 1580m;
+    protected DateTime ultimoViaje;
+    protected int viajesHoy;
+    protected DateTime fechaUltimoDia;
+    private static int contadorId = 0;
+    private int id;
+
+    public decimal Saldo
     {
-        protected decimal saldo;
-        protected decimal saldoPendienteAcreditacion;
-        private const decimal LIMITE_SALDO = 56000m;
-        public const decimal SALDO_NEGATIVO_MAXIMO = -1200m;
-        protected static readonly decimal[] CARGAS_ACEPTADAS =
-            { 2000m, 3000m, 4000m, 5000m, 8000m, 10000m, 15000m, 20000m, 25000m, 30000m, 60000m, 500m };
+        get { return saldo; }
+    }
 
-        public decimal Saldo => saldo;
-        public decimal SaldoPendienteAcreditacion => saldoPendienteAcreditacion;
-        public int Id { get; protected set; }
-        private static int proximoId = 1;
+    public decimal SaldoPendiente
+    {
+        get { return saldoPendiente; }
+    }
 
-        private List<DateTime> historialViajes;
-        private List<DateTime> historialViajesMensual;
-        protected Tarjeta()
+    public int Id
+    {
+        get { return id; }
+    }
+
+    public Tarjeta()
+    {
+        saldo = 0m;
+        saldoPendiente = 0m;
+        ultimoViaje = DateTime.MinValue;
+        viajesHoy = 0;
+        fechaUltimoDia = DateTime.MinValue;
+        id = ++contadorId;
+    }
+
+    public virtual bool Cargar(decimal monto)
+    {
+        decimal[] montosAceptados = { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
+
+        if (!montosAceptados.Contains(monto))
+            return false;
+
+        // Si hay saldo negativo, primero se descuenta de la carga
+        if (saldo < 0)
         {
-            saldo = 0m;
-            saldoPendienteAcreditacion = 0m;
-            Id = proximoId++;
-            historialViajes = new List<DateTime>();
-            historialViajesMensual = new List<DateTime>();
-        }
-
-        public virtual bool Cargar(decimal monto)
-        {
-            if (!CARGAS_ACEPTADAS.Contains(monto))
-                return false;
-
-            if (saldo < 0)
+            decimal montoRestante = monto + saldo; // saldo es negativo, entonces suma es resta
+            if (montoRestante <= 0)
             {
-                decimal deuda = Math.Abs(saldo);
-                decimal montoRestante = monto - deuda;
-
-                if (montoRestante >= 0)
-                {
-                    saldo = 0m; 
-
-
-                    decimal espacioDisponible = LIMITE_SALDO - saldo;
-
-                    if (montoRestante <= espacioDisponible)
-                    {
-                        saldo += montoRestante;
-                    }
-                    else
-                    {
-                        saldo = LIMITE_SALDO;
-                        saldoPendienteAcreditacion += (montoRestante - espacioDisponible);
-                    }
-                    return true;
-                }
-                else
-                {
-
-                    saldo += monto;
-                    return true;
-                }
+                saldo += monto;
+                return true;
             }
             else
             {
-                decimal espacioDisponible = LIMITE_SALDO - saldo;
-
-                if (monto <= espacioDisponible)
-                {
-                    saldo += monto;
-                }
-                else
-                {
-                    saldo = LIMITE_SALDO;
-                    saldoPendienteAcreditacion += (monto - espacioDisponible);
-                }
-                return true;
+                saldo = 0;
+                monto = montoRestante;
             }
         }
 
+        decimal espacioDisponible = LIMITE_SALDO - saldo;
+
+        if (espacioDisponible >= monto)
+        {
+            saldo += monto;
+        }
+        else
+        {
+            saldo = LIMITE_SALDO;
+            saldoPendiente += (monto - espacioDisponible);
+        }
+
+        return true;
+    }
+
+    public void AcreditarCarga()
+    {
+        if (saldoPendiente <= 0)
+            return;
+
+        decimal espacioDisponible = LIMITE_SALDO - saldo;
         
-
-        public virtual bool Descontar(decimal monto)
+        if (espacioDisponible >= saldoPendiente)
         {
-            
-            if (saldo - monto < SALDO_NEGATIVO_MAXIMO)
-                return false;
-
-            saldo -= monto;
-            RegistrarViaje();
-            AcreditarCarga(); 
-            return true;
+            saldo += saldoPendiente;
+            saldoPendiente = 0m;
         }
-
-        public bool PuedeViajarGratuito()
+        else
         {
-
-            bool resultado = CantidadViajesHoy() < 2;
-
-            return resultado;
+            saldo = LIMITE_SALDO;
+            saldoPendiente -= espacioDisponible;
         }
+    }
 
-        protected void RegistrarViaje()
+    public virtual bool Descontar(decimal monto)
+    {
+        // Permitir saldo negativo hasta el límite permitido
+        if (saldo - monto < -SALDO_NEGATIVO_PERMITIDO)
+            return false;
+
+        saldo -= monto;
+        AcreditarCarga();
+        return true;
+    }
+
+    public virtual bool PagarPasaje()
+    {
+        bool resultado = Descontar(TARIFA_BASICA);
+        if (resultado)
         {
-            DateTime ahora = DateTime.Now;
-            historialViajes.Add(ahora);
-            historialViajesMensual.Add(ahora);
+            ultimoViaje = DateTime.Now;
         }
+        return resultado;
+    }
 
-        public int CantidadViajesHoy()
+    public virtual decimal ObtenerTarifa()
+    {
+        return TARIFA_BASICA;
+    }
+
+    public virtual string ObtenerTipo()
+    {
+        return "Normal";
+    }
+
+    protected void ActualizarContadorViajes()
+    {
+        DateTime ahora = DateTime.Now;
+        if (fechaUltimoDia.Date != ahora.Date)
         {
-            DateTime hoy = DateTime.Today;
-            return historialViajes.Count(v => v.Date == hoy);
+            viajesHoy = 0;
+            fechaUltimoDia = ahora;
         }
-
-        public bool PuedeViajarMedioBoleto()
-        {
-            if (historialViajes.Count == 0) return true;
-
-            DateTime ultimoViaje = historialViajes.Last();
-            TimeSpan tiempoDesdeUltimoViaje = DateTime.Now - ultimoViaje;
-
-
-            if (tiempoDesdeUltimoViaje.TotalSeconds < 5)  
-                return false;
-
-
-            if (CantidadViajesHoy() >= 2)
-                return false;
-
-            return true;
-        }
-
-        public virtual void AcreditarCarga()
-        {
-            if (saldoPendienteAcreditacion > 0)
-            {
-                decimal espacioDisponible = LIMITE_SALDO - saldo;
-                decimal montoAAcreditar = Math.Min(saldoPendienteAcreditacion, espacioDisponible);
-
-                saldo += montoAAcreditar;
-                saldoPendienteAcreditacion -= montoAAcreditar;
-            }
-        }
-
-        
-        public int CantidadViajesEsteMes()
-        {
-            DateTime ahora = DateTime.Now;
-            DateTime primerDiaMes = new DateTime(ahora.Year, ahora.Month, 1);
-            return historialViajesMensual.Count(v => v >= primerDiaMes && v <= ahora);
-        }
-        public void RegistrarViajeParaTest()
-        {
-            RegistrarViaje();
-        }
-
-
-        public abstract decimal CalcularMontoPasaje(decimal tarifaBase);
-        public abstract bool PuedePagar(decimal tarifaBase);
-
-
-        [ExcludeFromCodeCoverage]
-        public static void Main(string[] args)
-        {
-            Console.WriteLine("Sistema de Tarjeta SUBE - Modo compilación");
-            var colectivo = new Colectivo("132");
-            var franquicia = new FranquiciaCompleta();
-            Console.WriteLine("Sistema compilado correctamente");
-        }
-   
     }
 }

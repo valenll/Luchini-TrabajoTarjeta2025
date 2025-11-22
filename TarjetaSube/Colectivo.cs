@@ -1,83 +1,38 @@
-﻿using System;
-using TarjetaSube;
-
-public class Colectivo
+﻿public class Colectivo
 {
-    private const decimal TARIFA_BASICA = 1580m;
-    private const decimal TARIFA_INTERURBANA = 3000m;
     private string linea;
-    private bool esInterurbano;
+    private string empresa;
 
-    public Colectivo(string linea, bool esInterurbano = false)
+    public Colectivo(string linea, string empresa)
     {
         this.linea = linea;
-        this.esInterurbano = esInterurbano;
-    }
-
-    public decimal ObtenerTarifa()
-    {
-        return esInterurbano ? TARIFA_INTERURBANA : TARIFA_BASICA;
+        this.empresa = empresa;
     }
 
     public Boleto PagarCon(Tarjeta tarjeta)
     {
-        decimal tarifa = ObtenerTarifa();
-        bool esTrasbordo = SistemaTrasbordos.PuedeRealizarTrasbordo(tarjeta.Id, this.linea);
-        decimal montoPasaje = esTrasbordo ? 0m : tarjeta.CalcularMontoPasaje(tarifa);
+        if (tarjeta == null)
+            return null;
 
-        decimal saldoAnterior = tarjeta.Saldo;
+        decimal tarifaAPagar = tarjeta.ObtenerTarifa();
 
-        if (tarjeta.PuedePagar(tarifa) || esTrasbordo)
+        // Intentar pagar el pasaje - la tarjeta maneja internamente
+        // si tiene saldo suficiente o puede usar saldo negativo
+        if (tarjeta.PagarPasaje())
         {
-            bool descuentoExitoso = tarjeta.Descontar(montoPasaje);
-
-            if (descuentoExitoso || esTrasbordo)
-            {
-                decimal montoRecarga = 0;
-                decimal totalAbonado = montoPasaje;
-
-                if (!esTrasbordo && saldoAnterior < 0)
-                {
-                    montoRecarga = Math.Min(Math.Abs(saldoAnterior), montoPasaje);
-                    totalAbonado = montoPasaje + montoRecarga;
-                }
-
-                Boleto? boletoOrigen = null;
-                if (esTrasbordo)
-                {
-                    boletoOrigen = SistemaTrasbordos.ObtenerBoletoOrigenTrasbordo(tarjeta.Id, this.linea);
-                }
-
-                var boleto = new Boleto(
-                    montoPasaje,
-                    linea,
-                    DateTime.Now,
-                    true,
-                    tarjeta.GetType().Name,
-                    tarjeta.Saldo,
-                    tarjeta.Id,
-                    totalAbonado,
-                    montoRecarga,
-                    esTrasbordo,
-                    boletoOrigen?.IdTarjeta
-                );
-
-                SistemaTrasbordos.RegistrarBoleto(boleto);
-                return boleto;
-            }
+            return new Boleto(tarifaAPagar, linea, empresa, tarjeta.Saldo, tarjeta.ObtenerTipo(), tarjeta.Id);
         }
 
-        var boletoInvalido = new Boleto(
-            montoPasaje,
-            linea,
-            DateTime.Now,
-            false,
-            tarjeta.GetType().Name,
-            tarjeta.Saldo,
-            tarjeta.Id
-        );
+        return null;
+    }
 
-        SistemaTrasbordos.RegistrarBoleto(boletoInvalido);
-        return boletoInvalido;
+    public string Linea
+    {
+        get { return linea; }
+    }
+
+    public string Empresa
+    {
+        get { return empresa; }
     }
 }
