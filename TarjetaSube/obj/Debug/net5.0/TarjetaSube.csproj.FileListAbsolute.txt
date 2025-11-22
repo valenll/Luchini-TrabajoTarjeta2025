@@ -65,3 +65,16 @@ C:\Users\PC\Downloads\TrabajoTarjeta2025-Luchini-iteracion3\TarjetaSube\obj\Debu
 C:\Users\PC\Downloads\TrabajoTarjeta2025-Luchini-iteracion3\TarjetaSube\obj\Debug\net5.0\refint\TarjetaSube.dll
 C:\Users\PC\Downloads\TrabajoTarjeta2025-Luchini-iteracion3\TarjetaSube\obj\Debug\net5.0\TarjetaSube.pdb
 C:\Users\PC\Downloads\TrabajoTarjeta2025-Luchini-iteracion3\TarjetaSube\obj\Debug\net5.0\ref\TarjetaSube.dll
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\bin\Debug\net5.0\TarjetaSube.deps.json
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\bin\Debug\net5.0\TarjetaSube.dll
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\bin\Debug\net5.0\TarjetaSube.pdb
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.csproj.AssemblyReference.cache
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.AssemblyInfoInputs.cache
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.AssemblyInfo.cs
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.csproj.CoreCompileInputs.cache
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.sourcelink.json
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.dll
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\refint\TarjetaSube.dll
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\TarjetaSube.pdb
+C:\Users\PC\Desktop\6to\Luchini-TrabajoTarjeta2025\TarjetaSube\obj\Debug\net5.0\ref\TarjetaSube.dll
