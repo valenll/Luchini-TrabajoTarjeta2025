@@ -9,16 +9,23 @@ public class Boleto
     private DateTime fechaHora;
     private string tipoTarjeta;
     private int idTarjeta;
+    private bool esTrasbordo;
 
-    public Boleto(decimal montoPagado, string lineaColectivo, string empresa, decimal saldoRestante, string tipoTarjeta, int idTarjeta)
+    public Boleto(decimal montoPagado, string lineaColectivo, string empresa, decimal saldoRestante, string tipoTarjeta, int idTarjeta, bool esTrasbordo = false)
+        : this(montoPagado, lineaColectivo, empresa, saldoRestante, tipoTarjeta, idTarjeta, esTrasbordo, new TiempoReal())
+    {
+    }
+
+    public Boleto(decimal montoPagado, string lineaColectivo, string empresa, decimal saldoRestante, string tipoTarjeta, int idTarjeta, bool esTrasbordo, ITiempoProvider tiempoProvider)
     {
         this.montoPagado = montoPagado;
         this.lineaColectivo = lineaColectivo;
         this.empresa = empresa;
         this.saldoRestante = saldoRestante;
-        this.fechaHora = DateTime.Now;
+        this.fechaHora = tiempoProvider.Ahora;
         this.tipoTarjeta = tipoTarjeta;
         this.idTarjeta = idTarjeta;
+        this.esTrasbordo = esTrasbordo;
     }
 
     public decimal MontoPagado
@@ -71,9 +78,15 @@ public class Boleto
         get { return idTarjeta; }
     }
 
+    public bool EsTrasbordo
+    {
+        get { return esTrasbordo; }
+    }
+
     public override string ToString()
     {
-        return $"Boleto - Fecha: {fechaHora:dd/MM/yyyy HH:mm}\n" +
+        string trasbordoTexto = esTrasbordo ? " (TRASBORDO)" : "";
+        return $"Boleto{trasbordoTexto} - Fecha: {fechaHora:dd/MM/yyyy HH:mm}\n" +
                $"Línea: {lineaColectivo} - Empresa: {empresa}\n" +
                $"Tipo de tarjeta: {tipoTarjeta} (ID: {idTarjeta})\n" +
                $"Total abonado: ${montoPagado}\n" +

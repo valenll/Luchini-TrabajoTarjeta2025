@@ -8,13 +8,21 @@ namespace TarjetaTests
     {
         private const decimal LIMITE_SALDO = 56000m;
         private const decimal TARIFA_BASICA = 1580m;
+        private TiempoSimulado tiempo;
+
+        [SetUp]
+        public void Setup()
+        {
+            // Lunes 25 nov 2024, 10:00 AM
+            tiempo = new TiempoSimulado(new DateTime(2024, 11, 25, 10, 0, 0));
+        }
 
         #region Tests Principales Requeridos
 
         [Test]
         public void Test_CargaSuperaMaximo_AcreditaHastaLimiteYGuardaExcedente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             // Cargar hasta estar cerca del límite (54000)
             tarjeta.Cargar(30000);
@@ -36,7 +44,7 @@ namespace TarjetaTests
         [Test]
         public void Test_LuegoDeViaje_AcreditaSaldoPendienteAutomaticamente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             // Cargar hasta superar el límite
             tarjeta.Cargar(30000);
@@ -68,7 +76,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Constructor_InicializaCorrectamente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             Assert.AreEqual(0m, tarjeta.Saldo, "El saldo inicial debe ser 0");
             Assert.AreEqual(0m, tarjeta.SaldoPendiente, "El saldo pendiente inicial debe ser 0");
@@ -78,7 +86,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PropertySaldo_RetornaValorCorrecto()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000);
 
             decimal saldo = tarjeta.Saldo;
@@ -89,7 +97,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PropertySaldoPendiente_RetornaValorCorrecto()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000);
 
@@ -101,9 +109,9 @@ namespace TarjetaTests
         [Test]
         public void Test_PropertyId_EsUnico()
         {
-            Tarjeta tarjeta1 = new Tarjeta();
-            Tarjeta tarjeta2 = new Tarjeta();
-            Tarjeta tarjeta3 = new Tarjeta();
+            Tarjeta tarjeta1 = new Tarjeta(tiempo);
+            Tarjeta tarjeta2 = new Tarjeta(tiempo);
+            Tarjeta tarjeta3 = new Tarjeta(tiempo);
 
             Assert.AreNotEqual(tarjeta1.Id, tarjeta2.Id, "Los IDs deben ser únicos");
             Assert.AreNotEqual(tarjeta2.Id, tarjeta3.Id, "Los IDs deben ser únicos");
@@ -123,7 +131,7 @@ namespace TarjetaTests
         [TestCase(30000)]
         public void Test_Cargar_MontosValidos_RetornaTrue(decimal monto)
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             bool resultado = tarjeta.Cargar(monto);
 
@@ -142,7 +150,7 @@ namespace TarjetaTests
         [TestCase(50000)]
         public void Test_Cargar_MontosInvalidos_RetornaFalse(decimal monto)
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             bool resultado = tarjeta.Cargar(monto);
 
@@ -153,7 +161,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Cargar_SinExcederLimite_AcreditaTodoAlSaldo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             tarjeta.Cargar(20000);
             tarjeta.Cargar(15000);
@@ -165,7 +173,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Cargar_ExactamenteElLimite_NoGeneraPendiente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             tarjeta.Cargar(30000);
             tarjeta.Cargar(20000);
@@ -179,7 +187,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Cargar_SuperaLimitePorMucho_GuardaTodoElExcedente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
 
             tarjeta.Cargar(30000); // Total: 60000, excede por 4000
@@ -191,7 +199,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Cargar_EnElLimite_TodoVaAPendiente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(20000);
             tarjeta.Cargar(5000);
@@ -206,7 +214,7 @@ namespace TarjetaTests
         [Test]
         public void Test_AcreditarCarga_SinSaldoPendiente_NoHaceNada()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(10000);
             decimal saldoInicial = tarjeta.Saldo;
 
@@ -219,7 +227,7 @@ namespace TarjetaTests
         [Test]
         public void Test_AcreditarCarga_ConEspacioSuficiente_AcreditaTodo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000); // Saldo: 56000, Pendiente: 4000
             tarjeta.Descontar(10000); // Saldo: 46000, Pendiente: 4000
@@ -234,7 +242,7 @@ namespace TarjetaTests
         [Test]
         public void Test_AcreditarCarga_ConEspacioInsuficiente_AcreditaParcial()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000); // Saldo: 56000, Pendiente: 4000
             tarjeta.Descontar(1000); // Saldo: 55000, se acredita 1000, quedan 3000 pendientes
@@ -247,7 +255,7 @@ namespace TarjetaTests
         [Test]
         public void Test_AcreditarCarga_EspacioExacto_AcreditaTodoYCero()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000); // Saldo: 56000, Pendiente: 4000
             tarjeta.Descontar(4000); // Saldo: 52000, espacio: 4000, pendiente: 4000
@@ -259,7 +267,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Descontar_ConSaldoSuficiente_RetornaTrue()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000);
             
             bool resultado = tarjeta.Descontar(2000);
@@ -271,7 +279,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Descontar_ConSaldoInsuficiente_UsaSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000);
 
             // Con saldo negativo, permite hasta -1200
@@ -284,7 +292,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Descontar_ExactamenteTodoElSaldo_SaldoCero()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000);
 
             bool resultado = tarjeta.Descontar(5000);
@@ -296,7 +304,7 @@ namespace TarjetaTests
         [Test]
         public void Test_Descontar_LlamaAcreditarCarga_Automaticamente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000); // Saldo: 56000, Pendiente: 4000
 
@@ -310,7 +318,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PagarPasaje_ConSaldoSuficiente_RetornaTrue()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000);
 
             bool resultado = tarjeta.PagarPasaje();
@@ -322,7 +330,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PagarPasaje_ConSaldoInsuficiente_UsaSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000);
             tarjeta.PagarPasaje(); // Queda con 420
 
@@ -336,7 +344,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PagarPasaje_DescuentaTarifaBasica()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(10000);
             decimal saldoInicial = tarjeta.Saldo;
 
@@ -348,7 +356,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PagarPasaje_ConSaldoPendiente_AcreditaAutomaticamente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000); // Saldo: 56000, Pendiente: 4000
 
@@ -362,7 +370,7 @@ namespace TarjetaTests
         [Test]
         public void Test_PagarPasaje_MultiplesVeces_DescuentaCorrectamente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(10000);
 
             tarjeta.PagarPasaje(); // 10000 - 1580 = 8420
@@ -375,7 +383,7 @@ namespace TarjetaTests
         [Test]
         public void Test_ObtenerTarifa_RetornaTarifaBasica()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             decimal tarifa = tarjeta.ObtenerTarifa();
 
@@ -385,7 +393,7 @@ namespace TarjetaTests
         [Test]
         public void Test_ObtenerTipo_RetornaNormal()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             string tipo = tarjeta.ObtenerTipo();
 
@@ -395,7 +403,7 @@ namespace TarjetaTests
         [Test]
         public void Test_MultiplesCargas_AcumulanSaldoPendiente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             tarjeta.Cargar(30000);  // Saldo: 30000
             tarjeta.Cargar(30000);  // Saldo: 56000, Pendiente: 4000
@@ -409,7 +417,7 @@ namespace TarjetaTests
         [Test]
         public void Test_IntegracionCompleta_CargaViajesYAcreditacion()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
 
             //Cargar hasta superar límite
             tarjeta.Cargar(30000);
@@ -441,8 +449,8 @@ namespace TarjetaTests
         [Test]
         public void Test_CargaMinimaYMaxima_FuncionanCorrectamente()
         {
-            Tarjeta tarjeta1 = new Tarjeta();
-            Tarjeta tarjeta2 = new Tarjeta();
+            Tarjeta tarjeta1 = new Tarjeta(tiempo);
+            Tarjeta tarjeta2 = new Tarjeta(tiempo);
 
             bool cargaMinima = tarjeta1.Cargar(2000);
             bool cargaMaxima = tarjeta2.Cargar(30000);
@@ -457,7 +465,7 @@ namespace TarjetaTests
         [Test]
         public void Test_SaldoPendiente_SeAcreditaProgresivamente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(30000);
             tarjeta.Cargar(30000); // Pendiente: 4000
 
@@ -477,7 +485,7 @@ namespace TarjetaTests
         [Test]
         public void Test_SaldoNegativo_PermiteHasta1200()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             bool resultado = tarjeta.Descontar(1200m);
             
@@ -488,7 +496,7 @@ namespace TarjetaTests
         [Test]
         public void Test_SaldoNegativo_NoPermiteSuperarLimite()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             bool resultado = tarjeta.Descontar(1201m);
             
@@ -499,7 +507,7 @@ namespace TarjetaTests
         [Test]
         public void Test_RecargaConSaldoNegativo_DescuentaDeuda()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Descontar(500m); // Saldo = -500
             
             tarjeta.Cargar(3000m);

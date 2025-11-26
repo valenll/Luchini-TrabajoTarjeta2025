@@ -6,12 +6,15 @@ namespace TarjetaSubeTest
     [TestFixture]
     public class ColectivoTest
     {
+        private TiempoSimulado tiempo;
         private Colectivo colectivo;
 
         [SetUp]
         public void Setup()
         {
-            colectivo = new Colectivo("152", "Rosario Bus");
+            // Lunes 25 nov 2024, 10:00 AM (horario permitido para franquicias)
+            tiempo = new TiempoSimulado(new DateTime(2024, 11, 25, 10, 0, 0));
+            colectivo = new Colectivo("152", "Rosario Bus", tiempo);
         }
 
         [Test]
@@ -34,9 +37,9 @@ namespace TarjetaSubeTest
         }
 
         [Test]
-        public void TestPagarConSaldoInsuficiente_UsaSaldoNegativo()
+        public void Test_PagarConSaldoInsuficiente_UsaSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000);
             tarjeta.Descontar(500); // Saldo: 1500
 
@@ -50,7 +53,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestPagarConSaldoExacto()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000);
             tarjeta.Descontar(420);
 
@@ -65,7 +68,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestPagarConSaldoSuficiente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(3000);
 
             Boleto boleto = colectivo.PagarCon(tarjeta);
@@ -79,7 +82,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestPagarVariosViajes()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000);
 
             Boleto boleto1 = colectivo.PagarCon(tarjeta);
@@ -98,7 +101,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestDatosColectivo()
         {
-            Colectivo colectivoK = new Colectivo("K", "Las Delicias");
+            Colectivo colectivoK = new Colectivo("K", "Las Delicias", tiempo);
             Assert.AreEqual("K", colectivoK.Linea);
             Assert.AreEqual("Las Delicias", colectivoK.Empresa);
         }
@@ -106,8 +109,8 @@ namespace TarjetaSubeTest
         [Test]
         public void TestBoletoContieneInformacionDelColectivo()
         {
-            Colectivo colectivo143 = new Colectivo("143", "Semtur");
-            Tarjeta tarjeta = new Tarjeta();
+            Colectivo colectivo143 = new Colectivo("143", "Semtur", tiempo);
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000);
 
             Boleto boleto = colectivo143.PagarCon(tarjeta);
@@ -120,7 +123,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestPagarConMedioBoleto()
         {
-            TarjetaMedioBoleto tarjeta = new TarjetaMedioBoleto();
+            TarjetaMedioBoleto tarjeta = new TarjetaMedioBoleto(tiempo);
             tarjeta.Cargar(3000);
 
             Boleto boleto = colectivo.PagarCon(tarjeta);
@@ -133,7 +136,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestPagarConFranquiciaCompleta()
         {
-            TarjetaFranquiciaCompleta tarjeta = new TarjetaFranquiciaCompleta();
+            TarjetaFranquiciaCompleta tarjeta = new TarjetaFranquiciaCompleta(tiempo);
 
             Boleto boleto = colectivo.PagarCon(tarjeta);
             
@@ -145,7 +148,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestPagarConBoletoGratuitoEstudiantil()
         {
-            TarjetaBoletoGratuitoEstudiantil tarjeta = new TarjetaBoletoGratuitoEstudiantil();
+            TarjetaBoletoGratuitoEstudiantil tarjeta = new TarjetaBoletoGratuitoEstudiantil(tiempo);
 
             Boleto boleto = colectivo.PagarCon(tarjeta);
             
@@ -157,7 +160,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestMedioBoletoConSaldoInsuficiente_UsaSaldoNegativo()
         {
-            TarjetaMedioBoleto tarjeta = new TarjetaMedioBoleto();
+            TarjetaMedioBoleto tarjeta = new TarjetaMedioBoleto(tiempo);
             tarjeta.Cargar(2000);
             tarjeta.Descontar(1500); // Queda 500
 
@@ -172,19 +175,19 @@ namespace TarjetaSubeTest
         public void TestPolimorfismoConDiferentesTarjetas()
         {
             // Tarjeta normal
-            Tarjeta tarjetaNormal = new Tarjeta();
+            Tarjeta tarjetaNormal = new Tarjeta(tiempo);
             tarjetaNormal.Cargar(3000);
             Boleto boletoNormal = colectivo.PagarCon(tarjetaNormal);
             Assert.AreEqual(1580m, boletoNormal.MontoPagado);
 
             // Medio boleto
-            TarjetaMedioBoleto medioBoleto = new TarjetaMedioBoleto();
+            TarjetaMedioBoleto medioBoleto = new TarjetaMedioBoleto(tiempo);
             medioBoleto.Cargar(3000);
             Boleto boletoMedio = colectivo.PagarCon(medioBoleto);
             Assert.AreEqual(790m, boletoMedio.MontoPagado);
 
             // Franquicia completa
-            TarjetaFranquiciaCompleta franquicia = new TarjetaFranquiciaCompleta();
+            TarjetaFranquiciaCompleta franquicia = new TarjetaFranquiciaCompleta(tiempo);
             Boleto boletoGratis = colectivo.PagarCon(franquicia);
             Assert.AreEqual(0m, boletoGratis.MontoPagado);
         }
@@ -192,7 +195,7 @@ namespace TarjetaSubeTest
         [Test]
         public void TestFranquiciaCompletaMultiplesViajes()
         {
-            TarjetaFranquiciaCompleta tarjeta = new TarjetaFranquiciaCompleta();
+            TarjetaFranquiciaCompleta tarjeta = new TarjetaFranquiciaCompleta(tiempo);
             tarjeta.Cargar(20000m); // Cargar saldo para viajes posteriores
 
             // Los primeros dos viajes deben ser exitosos y gratuitos
@@ -212,6 +215,79 @@ namespace TarjetaSubeTest
                 Assert.AreEqual(1580m, boleto.MontoPagado, 
                     $"Viaje {i} debe cobrar tarifa completa (límite de viajes gratuitos alcanzado)");
             }
+        }
+
+        [Test]
+        public void TestTarjetaNormalFuncionaCualquierHorario()
+        {
+            // Probar sábado
+            tiempo.EstablecerTiempo(new DateTime(2024, 11, 23, 10, 0, 0));
+            Tarjeta tarjeta1 = new Tarjeta(tiempo);
+            tarjeta1.Cargar(5000);
+            Boleto boleto1 = colectivo.PagarCon(tarjeta1);
+            Assert.IsNotNull(boleto1, "Tarjeta normal funciona en sábado");
+
+            // Probar domingo madrugada
+            tiempo.EstablecerTiempo(new DateTime(2024, 11, 24, 3, 0, 0));
+            Tarjeta tarjeta2 = new Tarjeta(tiempo);
+            tarjeta2.Cargar(5000);
+            Boleto boleto2 = colectivo.PagarCon(tarjeta2);
+            Assert.IsNotNull(boleto2, "Tarjeta normal funciona domingo de madrugada");
+
+            // Probar lunes noche
+            tiempo.EstablecerTiempo(new DateTime(2024, 11, 25, 23, 0, 0));
+            Tarjeta tarjeta3 = new Tarjeta(tiempo);
+            tarjeta3.Cargar(5000);
+            Boleto boleto3 = colectivo.PagarCon(tarjeta3);
+            Assert.IsNotNull(boleto3, "Tarjeta normal funciona lunes de noche");
+        }
+
+        [Test]
+        public void TestFranquiciasFueraDeHorario_NoFuncionan()
+        {
+            // Cambiar a sábado (fuera de L-V)
+            tiempo.EstablecerTiempo(new DateTime(2024, 11, 23, 10, 0, 0));
+
+            TarjetaMedioBoleto medio = new TarjetaMedioBoleto(tiempo);
+            medio.Cargar(5000);
+            Boleto boletoMedio = colectivo.PagarCon(medio);
+            Assert.IsNull(boletoMedio, "Medio boleto no funciona en sábado");
+
+            TarjetaFranquiciaCompleta franquicia = new TarjetaFranquiciaCompleta(tiempo);
+            Boleto boletoFranquicia = colectivo.PagarCon(franquicia);
+            Assert.IsNull(boletoFranquicia, "Franquicia completa no funciona en sábado");
+        }
+
+        [Test]
+        public void TestBoletoTieneFechaCorrecta()
+        {
+            Tarjeta tarjeta = new Tarjeta(tiempo);
+            tarjeta.Cargar(5000);
+
+            Boleto boleto = colectivo.PagarCon(tarjeta);
+
+            Assert.IsNotNull(boleto);
+            Assert.AreEqual(new DateTime(2024, 11, 25, 10, 0, 0), boleto.FechaHora);
+        }
+
+        [Test]
+        public void TestMultiplesBoletosDiferentesFechas()
+        {
+            Tarjeta tarjeta = new Tarjeta(tiempo);
+            tarjeta.Cargar(10000);
+
+            Boleto boleto1 = colectivo.PagarCon(tarjeta);
+            Assert.AreEqual(new DateTime(2024, 11, 25, 10, 0, 0), boleto1.FechaHora);
+
+            // Avanzar 2 horas
+            tiempo.AvanzarHoras(2);
+            Boleto boleto2 = colectivo.PagarCon(tarjeta);
+            Assert.AreEqual(new DateTime(2024, 11, 25, 12, 0, 0), boleto2.FechaHora);
+
+            // Avanzar al día siguiente
+            tiempo.EstablecerTiempo(new DateTime(2024, 11, 26, 10, 0, 0));
+            Boleto boleto3 = colectivo.PagarCon(tarjeta);
+            Assert.AreEqual(new DateTime(2024, 11, 26, 10, 0, 0), boleto3.FechaHora);
         }
     }
 }

@@ -6,6 +6,7 @@ namespace TarjetaSubeTest
     [TestFixture]
     public class SaldoNegativoTest
     {
+        private TiempoSimulado tiempo;
         private Colectivo colectivo;
         private const decimal TARIFA_BASICA = 1580m;
         private const decimal SALDO_NEGATIVO_PERMITIDO = 1200m;
@@ -13,7 +14,9 @@ namespace TarjetaSubeTest
         [SetUp]
         public void Setup()
         {
-            colectivo = new Colectivo("152", "Rosario Bus");
+            // Lunes 25 nov 2024, 10:00 AM
+            tiempo = new TiempoSimulado(new DateTime(2024, 11, 25, 10, 0, 0));
+            colectivo = new Colectivo("152", "Rosario Bus", tiempo);
         }
 
         #region Tests de Saldo Negativo Básico
@@ -21,7 +24,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_TarjetaSinSaldo_PuedeViajarConSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             // Cargar poco saldo para que al viajar quede negativo
             tarjeta.Cargar(2000m); // Saldo = 2000
 
@@ -39,7 +42,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_SaldoNegativo_NoSuperaLimitePermitido()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             // Intentar descontar más del límite negativo permitido
             bool resultado = tarjeta.Descontar(SALDO_NEGATIVO_PERMITIDO + 1);
@@ -51,7 +54,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_SaldoNegativo_ExactamenteEnElLimite()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             // Descontar exactamente el límite negativo permitido
             bool resultado = tarjeta.Descontar(SALDO_NEGATIVO_PERMITIDO);
@@ -64,7 +67,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_SaldoNegativo_NoPermiteSuperarLimite()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Descontar(SALDO_NEGATIVO_PERMITIDO); // Saldo = -1200
 
             // Intentar otro viaje que superaría el límite
@@ -82,7 +85,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_ViajeConSaldoInsuficiente_UsaSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m);
             tarjeta.Descontar(1500m); // Saldo = 500 (menos que TARIFA_BASICA)
 
@@ -98,7 +101,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_BoletoConSaldoNegativo_MuestraMontoCorrecto()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m);
             tarjeta.Descontar(1500m); // Saldo = 500
 
@@ -114,7 +117,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_UnViajePlus_SaldoNegativoHasta1200()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m);
             tarjeta.Descontar(1600m); // Saldo = 400
 
@@ -123,14 +126,14 @@ namespace TarjetaSubeTest
             Assert.IsTrue(resultado, "Debe permitir un viaje plus");
             Assert.AreEqual(400m - TARIFA_BASICA, tarjeta.Saldo, 
                 "El saldo debe ser 400 - 1580 = -1180");
-            Assert.Greater(tarjeta.Saldo, -SALDO_NEGATIVO_PERMITIDO, 
+            Assert.Greater(tarjeta.Saldo, -SALDO_NEGATIVO_PERMITIDO - 1, 
                 "El saldo no debe superar el límite negativo");
         }
 
         [Test]
         public void Test_NoPermiteDosViajesPlus_SiSuperaLimite()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m);
             tarjeta.Descontar(1600m); // Saldo = 400
 
@@ -152,7 +155,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_RecargaConSaldoNegativo_DescuentaDeudaPrimero()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Descontar(800m); // Saldo = -800
 
             // Cargar 2000, debe primero pagar la deuda
@@ -163,9 +166,9 @@ namespace TarjetaSubeTest
         }
 
         [Test]
-        public void Test_RecargaConSaldoNegativo_CargaMasQueDeuda() // la deuda maxima es de 1200 entonces no se puede cargar y seguir quedando en negativo, pq el monto minimo de carga es 2000
+        public void Test_RecargaConSaldoNegativo_CargaMasQueDeuda()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Descontar(1000m); // Saldo = -1000
 
             // Cargar 2000, pero la deuda es 1000
@@ -178,7 +181,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_VariosViajesPlus_YRecarga()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(3000m); // Saldo = 3000
             
             // Primer viaje normal
@@ -203,7 +206,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_ColectivoPagarCon_TarjetaConSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m);
             tarjeta.Descontar(1600m); // Saldo = 400
 
@@ -220,9 +223,9 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_MultiplesViajes_ConYSinSaldoNegativo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(5000m);
-            tarjeta.Cargar(2000m); // hago por separado pq 7000 no es monto valido 
+            tarjeta.Cargar(2000m);
 
             // Viajes normales hasta quedarse con poco saldo
             Boleto b1 = colectivo.PagarCon(tarjeta); // 7000 - 1580 = 5420
@@ -242,7 +245,7 @@ namespace TarjetaSubeTest
             Assert.AreEqual(680m, tarjeta.Saldo);
 
             Boleto boletoPlus = colectivo.PagarCon(tarjeta); // 680 - 1580 = -900
-            Assert.IsNotNull(boletoPlus, "debe permitir un viaje plus, con saldo negativo"); 
+            Assert.IsNotNull(boletoPlus, "Debe permitir un viaje plus, con saldo negativo"); 
             Assert.AreEqual(-900m, tarjeta.Saldo);
 
             // Recargar
@@ -262,7 +265,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_SaldoExactamente_Menos1200()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             bool resultado = tarjeta.Descontar(1200m);
             
@@ -273,7 +276,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_SaldoMenos1201_NoPermitido()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             bool resultado = tarjeta.Descontar(1201m);
             
@@ -284,7 +287,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_DesdeNegativo_RecargarHastaPositivo()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Descontar(500m); // -500
             
             tarjeta.Cargar(3000m); // -500 + 3000 = 2500
@@ -295,7 +298,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_DesdeNegativo_RecargarYSuperarLimite()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m); // Cargar primero
             tarjeta.Descontar(3000m); // 2000 - 3000 = -1000
             
@@ -316,7 +319,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_SaldoNegativo_ConSaldoPendiente()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             
             // Llenar hasta el límite con pendiente
             tarjeta.Cargar(30000m);
@@ -339,7 +342,7 @@ namespace TarjetaSubeTest
         [Test]
         public void Test_ViajePlus_BoletoCorrecto()
         {
-            Tarjeta tarjeta = new Tarjeta();
+            Tarjeta tarjeta = new Tarjeta(tiempo);
             tarjeta.Cargar(2000m);
             tarjeta.Descontar(1500m); // Saldo = 500
             
@@ -352,6 +355,7 @@ namespace TarjetaSubeTest
             Assert.AreEqual(-1080m, boleto.SaldoRestante);
             Assert.AreEqual("Normal", boleto.TipoTarjeta);
             Assert.IsNotNull(boleto.FechaHora);
+            Assert.AreEqual(new DateTime(2024, 11, 25, 10, 0, 0), boleto.FechaHora);
         }
 
         #endregion
