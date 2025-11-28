@@ -14,15 +14,11 @@ public class Tarjeta
     protected DateTime fechaUltimoDia;
     private static int contadorId = 0;
     private int id;
-    
-    // Nuevos campos para Iteración 4
     protected int viajesMensuales;
     protected DateTime fechaUltimoMes;
     protected DateTime ultimoBoletoParaTrasbordo;
     protected string ultimaLineaUsada;
     protected List<string> lineasUsadasEnTrasbordo;
-
-    // Proveedor de tiempo inyectable
     protected ITiempoProvider tiempoProvider;
 
     public decimal Saldo
@@ -59,7 +55,6 @@ public class Tarjeta
         fechaUltimoDia = DateTime.MinValue;
         id = ++contadorId;
         
-        // Inicializar campos para Iteración 4
         viajesMensuales = 0;
         fechaUltimoMes = DateTime.MinValue;
         ultimoBoletoParaTrasbordo = DateTime.MinValue;

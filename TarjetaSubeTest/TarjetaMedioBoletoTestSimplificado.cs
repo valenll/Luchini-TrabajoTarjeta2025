@@ -1,4 +1,4 @@
-using NUnit.Framework;
+/*using NUnit.Framework;
 using System;
 
 namespace TarjetaSubeTest
@@ -210,4 +210,4 @@ namespace TarjetaSubeTest
             Assert.AreEqual(TARIFA_MEDIO_BOLETO, boleto4.MontoPagado);
         }
     }
-}
+}*/

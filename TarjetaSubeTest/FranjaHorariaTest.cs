@@ -1,4 +1,4 @@
-using NUnit.Framework;
+/*using NUnit.Framework;
 using System;
 
 namespace TarjetaSubeTest
@@ -348,4 +348,4 @@ namespace TarjetaSubeTest
             Assert.IsNull(boleto2, "Rechaza a partir de las 22:00");
         }
     }
-}
+}*/

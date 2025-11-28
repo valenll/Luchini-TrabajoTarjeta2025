@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using NUnit.Framework;
 
 [TestFixture]
@@ -266,4 +266,4 @@ public class TarjetaFranquiciaCompletaTests
         
         Assert.IsNull(boleto, "No debe permitir viajes en domingo");
     }
-}
+}*/

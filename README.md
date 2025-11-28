@@ -1,15 +1,46 @@
-[![codecov](https://codecov.io/github/LeonYaquinto/TrabajoTarjeta2025YaquintoLuchini/graph/badge.svg?token=20O9VMFR5F)](https://codecov.io/github/LeonYaquinto/TrabajoTarjeta2025YaquintoLuchini)
+## Mesa Diciembre (3/12)
+
+Para el examen de diciembre se les solicita realizar las siguientes tareas.<br>
+Respecto al examen, este va a ser teorico y tambien habra una defensa oral de los nuevos requerimientos del TP.
+
+### Consideraciones importantes
+Quienes no hayan completado la implementación de las iteraciones anteriores deberán hacerlo.<br>
+En caso de tener problemas en sus clases y que estos les dificulten la implementación de las nuevas tareas o el testing, están habilitados para modificarlas como crean conveniente, siempre teniendo en cuenta las correcciones que se les enviaron via mail.<br>
+Respecto a los tests de sus respectivos proyectos, vamos a obviarlos ya que seria un trabajo muy extenso corregirlos todos.<br>
+Cara alumno va a hacer un fork del repositorio de su proyecto (si ustedes son los propietarios del repositorio no seria necesario hacer esto, pueden continuar en su repositorio).<br>
+Los requisitos planteados mas adelante deberán desarrollarlos individualmente.<br>
+En caso de necesitar clases de consulta las vamos a coordinar via mail (mgonzales@ips.edu.ar). Tambien pueden consultar lo que necesiten por esten medio.
+
+### Transbordo 
+Ahora todas las tarjetas pueden realizar transbordos independientemente de su beneficio, respetando las restricciones horarias planteadas previamente en la iteración 4.
+
+### Mi Bici Tu Bici
+Implementar el sistema de "mi bici tu bici". Cuando un usuario va a retirar una bici de la estación de bicicletas, debe pagar la tarifa de servicio con su tarjeta SUBE. Si el pago es procesado correctamente, entonces podrá retirar una bicicleta, sino la estación rechazara el pago y no le permitirá retirar la misma. Se les pide:
+- Crear la clase que representara a la estacion de bicicletas y los métodos que consideren necesarios para cumplir con los requerimientos.
+- Cualquier tarjeta puede abonar el servicio.
+- La tarifa es de 1777,50 por dia.
+- El tiempo máximo de uso de una bici es de 1 hora. Por lo tanto si el uso de la misma excede el tiempo limite se le aplicara una multa de 1000 pesos a la hora de pagar. Esta multa se acumula si la persona uso la bici mas tiempo del estipulado varias veces el mismo dia.
+- No existen descuentos por franquicia para este sistema. 
+
+### Nuevos Tests
+Para los tests se les pide hacer tests de integración, uno para las nuevas funcionalidades del sistema de Mi Bici Tu Bici y para el método PagarCon del Colectivo cuando se quiere pagar con una Tarjeta Medio Boleto.
+
+El objetivo de estos tests es simular y validar el comportamiento del código que implementaron.<br>
+Los casos que deberían probar son: 
+### Test Mi Bici Tu Bici
+- Se paga la tarifa y se retira una bici exitosamente. Verificando que la tarifa cobrada sea la correcta, sin demora en la devolución y con el saldo suficiente en la tarjeta. 
+- No se puede retirar la bici. Validando que esto suceda cuando no hay suficiente saldo en la tarjeta teniendo o no una multa pendiente de pagar.
+- Se retira una bici con una o varias multas acumuladas. 
+
+### Test PagarCon MedioBoleto
+- Se pueden pagar dos boletos a mitad de precio. Verificando que el tiempo correspondiente paso entre uno y otro, que hay saldo suficiente y que el saldo negativo también permite pagar medio boleto.
+- Se pagan dos boletos a mitad de precio y el tercero a precio normal. Los mismo que el anterior.
+- Verificar que la misma pueda viajar con transbordo si se cumplen los requisitos. El transbordo tiene mas peso que el medio boleto por lo que si tiene viajes a mitad de previo disponibles pero se cumplen los requisitos del transbordo debería viajar gratis en lugar de pagar. Para este caso deberían testear los casos en los que se puede viajar y en los que no con transbordo.
 
 # Trabajo Tarjeta 2025
 El siguiente trabajo es un enunciado iterativo. Regularmente se ampliará y/o modificará el enunciado.
 
 [ENTREGA](https://forms.gle/qAe7JqK6GKBvNcYU7)
-<br>
-
-## Aclaraciones:
-
-El siguiente trabajo es un enunciado iterativo. Regularmente se ampliará y/o modificará el enunciado.
-
 <br>
 
 ## Aclaraciones:

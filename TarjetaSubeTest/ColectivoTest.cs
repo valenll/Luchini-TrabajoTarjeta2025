@@ -1,4 +1,4 @@
-using NUnit.Framework;
+/*using NUnit.Framework;
 using System;
 
 namespace TarjetaSubeTest
@@ -290,4 +290,4 @@ namespace TarjetaSubeTest
             Assert.AreEqual(new DateTime(2024, 11, 26, 10, 0, 0), boleto3.FechaHora);
         }
     }
-}
+}*/

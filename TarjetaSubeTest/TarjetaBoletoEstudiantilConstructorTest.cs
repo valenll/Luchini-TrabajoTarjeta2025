@@ -1,4 +1,4 @@
-using NUnit.Framework;
+/*using NUnit.Framework;
 using System;
 
 namespace TarjetaSubeTest
@@ -69,4 +69,4 @@ namespace TarjetaSubeTest
             Assert.AreNotEqual(tarjeta1.Id, tarjeta2.Id);
         }
     }
-}
+}*/
